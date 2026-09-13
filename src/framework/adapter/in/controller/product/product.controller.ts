@@ -1,4 +1,4 @@
-import { Controller, HttpCode, HttpStatus, Inject, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Inject, Post } from '@nestjs/common';
 import { ProductDTO } from '../../dto/ProductDTO.js';
 import { PRODUCT_PORT_IN } from '../../../../../application/port/in/product/ProductPortIn.js';
 import type { ProductPortIn } from '../../../../../application/port/in/product/ProductPortIn.js';
@@ -12,7 +12,7 @@ export class ProductController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createProduct(dto: ProductDTO): Promise<void> {
+  async createProduct(@Body() dto: ProductDTO): Promise<void> {
     await this.productPortIn.saveProduct(dto)
   }
 }
