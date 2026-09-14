@@ -1,13 +1,11 @@
-import { CategoryEnum } from '../../enum/product/CategoryEnum.js';
-
 export class ProductEntity {
   constructor(
     public readonly id: number,
     public name: string,
     public price: number,
     public isActive: boolean = true,
-    public category: CategoryEnum,
-    public readonly created: Date = new Date()
+    public readonly created: Date = new Date(),
+    public categoryId: number,
   ) {
     this.validate();
   }
@@ -27,15 +25,19 @@ export class ProductEntity {
       throw new Error("Produto não está ativo.")
     }
 
+    if (newPrice <= 0) {
+      throw new Error("O preço do produto não pode ser menor ou igual a R$ 0,00.");
+    }
+
     this.price = newPrice;
   }
 
-  changeCategory(newCategory: CategoryEnum) {
-    if (newCategory === this.category) {
-      throw new Error("Categoria igual a anterior.")
+  changeCategory(newCategoryId: number) {
+    if (newCategoryId === this.categoryId) {
+      throw new Error("Categoria igual a anterior.");
     }
 
-    this.category = newCategory;
+    this.categoryId = newCategoryId;
   }
 
   changeName(newName: string) {
