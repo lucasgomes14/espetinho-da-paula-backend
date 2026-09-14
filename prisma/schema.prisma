@@ -12,13 +12,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Category {
+  id      Int       @id @default(autoincrement()) @map("ID")
+  name    String    @unique @map("NAME")
+
+  products Product[]
+
+  @@map("TBL_CATEGORY")
+}
+
 model Product {
   ID             Int      @id @default(autoincrement())
   NAME           String   @unique
   PRICE          Decimal  @db.Decimal(10, 2)
-  CATEGORY       String
   IS_ACTIVE      Boolean  @default(true)
-  CREATED        DateTime @default(now()) @map("CREATED")
+  CREATED_AT     DateTime @default(now()) @map("CREATED_AT")
+  CATEGORY_ID    Int      @map("CATEGORY_ID")
+  CATEGORY       Category @relation(fields: [CATEGORY_ID], references: [id])
 
-  @@map("ProductEntity")
+  @@map("TBL_PRODUCT")
 }
