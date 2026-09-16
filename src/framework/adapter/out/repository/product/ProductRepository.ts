@@ -101,4 +101,15 @@ export class ProductRepository implements ProductPortOut {
       throw new InternalServerErrorException('Erro interno ao atualizar o produto.');
     }
   }
+
+  async deleteProduct(productEntity: ProductEntity): Promise<void> {
+    try {
+      await this.prisma.product.delete({
+        where: { ID: productEntity.id }
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar produto:', error);
+      throw new InternalServerErrorException('Erro interno ao deletar o produto.');
+    }
+  }
 }

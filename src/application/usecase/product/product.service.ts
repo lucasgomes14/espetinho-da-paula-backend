@@ -60,6 +60,12 @@ export class ProductService implements ProductPortIn {
   }
 
   async deleteProduct(id: number): Promise<void> {
-    throw new Error('Method not implemented.');
+    const productEntity = await this.productPortOut.getProductById(id);
+
+    if (!productEntity) {
+      throw new NotFoundException('Produto não encontrado.');
+    }
+
+    await this.productPortOut.deleteProduct(productEntity);
   }
 }

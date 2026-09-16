@@ -9,4 +9,5 @@ export interface ProductPortOut {
   getProductById(id: number): Promise<ProductEntity | null>;
   getAllProducts(): Promise<ProductEntity[]>;
   updateProduct(product: ProductEntity): Promise<void>;
+  deleteProduct(product: ProductEntity): Promise<void>;
 }
