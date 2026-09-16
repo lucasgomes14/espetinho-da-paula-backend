@@ -1,5 +1,5 @@
 import { ProductPortOut } from '../../../../../application/port/out/product/ProductPortOut.js';
-import { SaveProductDTO } from '../../../in/dto/SaveProductDTO.js';
+import { SaveProductDTO } from '../../../in/dto/product/SaveProductDTO.js';
 import {
   BadRequestException,
   Injectable,
@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../persistence/prisma/PrismaService.js';
 import { ProductEntity } from '../../../../../domain/entity/product/ProductEntity.js';
+import { UpdateProductDTO } from '../../../in/dto/product/UpdateProductDTO.js';
 
 @Injectable()
 export class ProductRepository implements ProductPortOut {
@@ -77,6 +78,27 @@ export class ProductRepository implements ProductPortOut {
       throw new InternalServerErrorException(
         'Erro interno ao acessar o banco de dados.',
       );
+    }
+  }
+
+  async updateProduct(productEntity: ProductEntity): Promise<void> {
+    try {
+      await this.prisma.product.update({
+        where: { ID: productEntity.id },
+        data: {
+          NAME: productEntity.name,
+          PRICE: productEntity.price,
+          CATEGORY_ID: productEntity.categoryId,
+          IS_ACTIVE: productEntity.isActive
+        },
+      });
+    } catch (error) {
+      const e = error as any;
+      if (e.code === 'P2002') {
+        throw new BadRequestException('Já existe um produto com este nome cadastrado.');
+      }
+      console.error('Erro ao atualizar produto:', error);
+      throw new InternalServerErrorException('Erro interno ao atualizar o produto.');
     }
   }
 }

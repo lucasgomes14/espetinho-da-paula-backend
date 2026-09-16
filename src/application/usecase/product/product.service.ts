@@ -6,12 +6,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ProductPortIn } from '../../port/in/product/ProductPortIn.js';
-import { SaveProductDTO } from '../../../framework/adapter/in/dto/SaveProductDTO.js';
+import { SaveProductDTO } from '../../../framework/adapter/in/dto/product/SaveProductDTO.js';
 import { PRODUCT_PORT_OUT } from '../../port/out/product/ProductPortOut.js';
 import type { ProductPortOut } from '../../port/out/product/ProductPortOut.js';
-import { ProductDTO } from '../../../framework/adapter/in/dto/ProductDTO.js';
+import { ProductDTO } from '../../../framework/adapter/in/dto/product/ProductDTO.js';
 import { ProductMapper } from '../../../framework/adapter/in/mapper/ProductMapper.js';
 import { ProductEntity } from '../../../domain/entity/product/ProductEntity.js';
+import { UpdateProductDTO } from '../../../framework/adapter/in/dto/product/UpdateProductDTO.js';
 
 @Injectable()
 export class ProductService implements ProductPortIn {
@@ -40,8 +41,22 @@ export class ProductService implements ProductPortIn {
     return productsEntity.map(e => ProductMapper.entityToDTO(e));
   }
 
-  async updateProduct(dto: SaveProductDTO): Promise<void> {
-    throw new Error('Method not implemented.');
+  async updateProduct(id: number, dto: UpdateProductDTO): Promise<void> {
+    const productEntity = await this.productPortOut.getProductById(id);
+
+    if (!productEntity) {
+      throw new NotFoundException('Produto não encontrado.');
+    }
+
+    if (dto.name !== productEntity.name) productEntity.changeName(dto.name);
+    if (dto.price !== productEntity.price) productEntity.updatePrice(dto.price);
+    if (dto.categoryId !== productEntity.categoryId) productEntity.changeCategory(dto.categoryId);
+
+    if (dto.isActive === false) {
+      productEntity.deactivateProduct();
+    }
+
+    await this.productPortOut.updateProduct(productEntity);
   }
 
   async deleteProduct(id: number): Promise<void> {
