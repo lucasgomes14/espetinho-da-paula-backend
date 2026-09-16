@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { SaveProductDTO } from '../../dto/product/SaveProductDTO.js';
 import { PRODUCT_PORT_IN } from '../../../../../application/port/in/product/ProductPortIn.js';
 import type { ProductPortIn } from '../../../../../application/port/in/product/ProductPortIn.js';
@@ -34,5 +46,11 @@ export class ProductController {
   @HttpCode(HttpStatus.OK)
   async updateProduct(@Param("id", ParseIntPipe) id: number, @Body() dto: UpdateProductDTO ): Promise<void> {
     await this.productPortIn.updateProduct(id, dto);
+  }
+
+  @Delete(":id")
+  @HttpCode(HttpStatus.OK)
+  async deleteProduct(@Param("id", ParseIntPipe) id: number): Promise<void> {
+    await this.productPortIn.deleteProduct(id);
   }
 }
