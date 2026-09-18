@@ -1,5 +1,5 @@
-import { ProductEntity } from '../../../../domain/entity/product/ProductEntity.js';
-import { ProductDTO } from '../dto/product/ProductDTO.js';
+import { ProductEntity } from '../../../../../domain/entity/product/ProductEntity.js';
+import { ProductDTO } from '../../dto/product/ProductDTO.js';
 
 export class ProductMapper {
   static entityToDTO(product: ProductEntity): ProductDTO {
