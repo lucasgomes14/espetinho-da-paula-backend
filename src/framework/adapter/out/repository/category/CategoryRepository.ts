@@ -11,7 +11,7 @@ export class CategoryRepository implements CategoryPortOut {
   async getCategoryById(id: number): Promise<CategoryEntity | null> {
     try {
       const categoryPrisma = await this.prisma.category.findUnique({
-        where: {ID: id},
+        where: { ID: id },
       });
 
       if (!categoryPrisma) {

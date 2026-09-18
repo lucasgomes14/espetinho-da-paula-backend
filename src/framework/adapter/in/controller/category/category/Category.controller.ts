@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Inject, Param } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Inject, Param, ParseIntPipe } from '@nestjs/common';
 import { CATEGORY_PORT_IN } from '../../../../../../application/port/in/category/CategoryPortIn.js';
 import type { CategoryPortIn } from '../../../../../../application/port/in/category/CategoryPortIn.js';
 import { CategoryDTO } from '../../../dto/category/CategoryDTO.js';
@@ -12,7 +12,7 @@ export class CategoryController {
 
   @Get(":id")
   @HttpCode(HttpStatus.OK)
-  async getCategoryById(@Param("id") id: number): Promise<CategoryDTO> {
+  async getCategoryById(@Param("id", ParseIntPipe) id: number): Promise<CategoryDTO> {
     return await this.categoryPortIn.getCategoryById(id);
   }
 
