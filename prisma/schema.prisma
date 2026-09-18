@@ -13,8 +13,8 @@ datasource db {
 }
 
 model Category {
-  id      Int       @id @default(autoincrement()) @map("ID")
-  name    String    @unique @map("NAME")
+  ID      Int       @id @default(autoincrement()) @map("ID")
+  NAME    String    @unique @map("NAME")
 
   products Product[]
 
@@ -28,7 +28,7 @@ model Product {
   IS_ACTIVE      Boolean  @default(true)
   CREATED_AT     DateTime @default(now()) @map("CREATED_AT")
   CATEGORY_ID    Int      @map("CATEGORY_ID")
-  CATEGORY       Category @relation(fields: [CATEGORY_ID], references: [id])
+  CATEGORY       Category @relation(fields: [CATEGORY_ID], references: [ID])
 
   @@map("TBL_PRODUCT")
 }

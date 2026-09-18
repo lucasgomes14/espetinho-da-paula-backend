@@ -1,16 +1,10 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ProductPortIn } from '../../port/in/product/ProductPortIn.js';
 import { SaveProductDTO } from '../../../framework/adapter/in/dto/product/SaveProductDTO.js';
-import { PRODUCT_PORT_OUT } from '../../port/out/product/ProductPortOut.js';
 import type { ProductPortOut } from '../../port/out/product/ProductPortOut.js';
+import { PRODUCT_PORT_OUT } from '../../port/out/product/ProductPortOut.js';
 import { ProductDTO } from '../../../framework/adapter/in/dto/product/ProductDTO.js';
-import { ProductMapper } from '../../../framework/adapter/in/mapper/ProductMapper.js';
+import { ProductMapper } from '../../../framework/adapter/in/mapper/product/ProductMapper.js';
 import { ProductEntity } from '../../../domain/entity/product/ProductEntity.js';
 import { UpdateProductDTO } from '../../../framework/adapter/in/dto/product/UpdateProductDTO.js';
 
@@ -18,7 +12,7 @@ import { UpdateProductDTO } from '../../../framework/adapter/in/dto/product/Upda
 export class ProductService implements ProductPortIn {
   constructor(
     @Inject(PRODUCT_PORT_OUT)
-    private readonly productPortOut : ProductPortOut
+    private readonly productPortOut: ProductPortOut,
   ) {}
 
   async saveProduct(dto: SaveProductDTO): Promise<void> {
@@ -33,12 +27,12 @@ export class ProductService implements ProductPortIn {
     }
 
     return ProductMapper.entityToDTO(product);
-
   }
 
   async getAllProducts(): Promise<ProductDTO[]> {
-    const productsEntity: ProductEntity[] = await this.productPortOut.getAllProducts();
-    return productsEntity.map(e => ProductMapper.entityToDTO(e));
+    const productsEntity: ProductEntity[] =
+      await this.productPortOut.getAllProducts();
+    return productsEntity.map((e) => ProductMapper.entityToDTO(e));
   }
 
   async updateProduct(id: number, dto: UpdateProductDTO): Promise<void> {
@@ -50,7 +44,8 @@ export class ProductService implements ProductPortIn {
 
     if (dto.name !== productEntity.name) productEntity.changeName(dto.name);
     if (dto.price !== productEntity.price) productEntity.updatePrice(dto.price);
-    if (dto.categoryId !== productEntity.categoryId) productEntity.changeCategory(dto.categoryId);
+    if (dto.categoryId !== productEntity.categoryId)
+      productEntity.changeCategory(dto.categoryId);
 
     if (dto.isActive === false) {
       productEntity.deactivateProduct();

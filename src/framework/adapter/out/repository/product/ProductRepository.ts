@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../persistence/prisma/PrismaService.js';
 import { ProductEntity } from '../../../../../domain/entity/product/ProductEntity.js';
-import { UpdateProductDTO } from '../../../in/dto/product/UpdateProductDTO.js';
 
 @Injectable()
 export class ProductRepository implements ProductPortOut {
@@ -50,7 +49,14 @@ export class ProductRepository implements ProductPortOut {
         return null;
       }
 
-      return new ProductEntity(productPrisma.ID, productPrisma.NAME, productPrisma.PRICE.toNumber(), productPrisma.IS_ACTIVE, productPrisma.CREATED_AT, productPrisma.CATEGORY_ID);
+      return new ProductEntity(
+        productPrisma.ID,
+        productPrisma.NAME,
+        productPrisma.PRICE.toNumber(),
+        productPrisma.IS_ACTIVE,
+        productPrisma.CREATED_AT,
+        productPrisma.CATEGORY_ID,
+      );
     } catch (error) {
       console.error(`Erro no banco ao buscar o produto ${id}:`, error);
       throw new InternalServerErrorException(
@@ -63,15 +69,15 @@ export class ProductRepository implements ProductPortOut {
     try {
       const productsPrisma = await this.prisma.product.findMany();
 
-      return productsPrisma.map(e => {
+      return productsPrisma.map((e) => {
         return new ProductEntity(
           e.ID,
           e.NAME,
           e.PRICE.toNumber(),
           e.IS_ACTIVE,
           e.CREATED_AT,
-          e.CATEGORY_ID
-        )
+          e.CATEGORY_ID,
+        );
       });
     } catch (error) {
       console.error(`Erro no banco ao buscar os produtos:`, error);
@@ -89,27 +95,33 @@ export class ProductRepository implements ProductPortOut {
           NAME: productEntity.name,
           PRICE: productEntity.price,
           CATEGORY_ID: productEntity.categoryId,
-          IS_ACTIVE: productEntity.isActive
+          IS_ACTIVE: productEntity.isActive,
         },
       });
     } catch (error) {
       const e = error as any;
       if (e.code === 'P2002') {
-        throw new BadRequestException('Já existe um produto com este nome cadastrado.');
+        throw new BadRequestException(
+          'Já existe um produto com este nome cadastrado.',
+        );
       }
       console.error('Erro ao atualizar produto:', error);
-      throw new InternalServerErrorException('Erro interno ao atualizar o produto.');
+      throw new InternalServerErrorException(
+        'Erro interno ao atualizar o produto.',
+      );
     }
   }
 
   async deleteProduct(productEntity: ProductEntity): Promise<void> {
     try {
       await this.prisma.product.delete({
-        where: { ID: productEntity.id }
+        where: { ID: productEntity.id },
       });
     } catch (error) {
       console.error('Erro ao atualizar produto:', error);
-      throw new InternalServerErrorException('Erro interno ao deletar o produto.');
+      throw new InternalServerErrorException(
+        'Erro interno ao deletar o produto.',
+      );
     }
   }
 }
