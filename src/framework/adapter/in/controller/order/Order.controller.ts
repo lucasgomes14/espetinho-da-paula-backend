@@ -21,21 +21,18 @@ export class OrderController {
     private readonly orderPortIn: OrderPortIn
   ) {}
 
-  // 1. Abrir comanda / Adicionar produtos a uma mesa (Ocupa a mesa)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createOrder(@Body() dto: CreateOrderDTO): Promise<void> {
     await this.orderPortIn.createOrder(dto);
   }
 
-  // 2. Fechar comanda de uma mesa (Libera a mesa novamente)
   @Patch(":id/close")
   @HttpCode(HttpStatus.OK)
   async closeOrder(@Param("id", ParseIntPipe) id: number): Promise<void> {
     await this.orderPortIn.closeOrder(id);
   }
 
-  // Adicionar mais produtos a uma comanda que já está aberta
   @Post(":id/items")
   @HttpCode(HttpStatus.OK)
   async addItemsToOrder(

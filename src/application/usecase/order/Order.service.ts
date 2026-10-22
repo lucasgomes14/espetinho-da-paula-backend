@@ -14,7 +14,6 @@ export class OrderService implements OrderPortIn {
   ) {}
 
   async createOrder(dto: CreateOrderDTO): Promise<void> {
-    // Verifica se a mesa já possui comanda aberta
     const existingOrder = await this.orderPortOut.findActiveOrderByTableId(dto.tableId);
 
     if (existingOrder) {
@@ -22,14 +21,14 @@ export class OrderService implements OrderPortIn {
     }
 
     const newOrder = new OrderEntity(
-      0, // ID gerado pelo banco
+      0,
       dto.tableId,
       OrderStatus.OPEN,
       dto.items.map(item => ({
         productId: item.productId,
-        productName: '', // Será preenchido ou buscado no repositório se necessário
+        productName: '',
         quantity: item.quantity,
-        price: 0, // Preço resgatado do produto no repositório
+        price: 0,
       }))
     );
 

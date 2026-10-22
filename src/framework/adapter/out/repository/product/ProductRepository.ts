@@ -67,7 +67,9 @@ export class ProductRepository implements ProductPortOut {
 
   async getAllProducts(): Promise<ProductEntity[]> {
     try {
-      const productsPrisma = await this.prisma.product.findMany();
+      const productsPrisma = await this.prisma.product.findMany({
+        where: { IS_ACTIVE: true },
+      });
 
       return productsPrisma.map((e) => {
         return new ProductEntity(
@@ -114,11 +116,12 @@ export class ProductRepository implements ProductPortOut {
 
   async deleteProduct(productEntity: ProductEntity): Promise<void> {
     try {
-      await this.prisma.product.delete({
+      await this.prisma.product.update({
         where: { ID: productEntity.id },
+        data: { IS_ACTIVE: false },
       });
     } catch (error) {
-      console.error('Erro ao atualizar produto:', error);
+      console.error(`Erro ao inativar o produto ${productEntity.id}:`, error);
       throw new InternalServerErrorException(
         'Erro interno ao deletar o produto.',
       );
