@@ -7,4 +7,5 @@ export interface OrderPortOut {
   getOrderById(id: number): Promise<OrderEntity | null>;
   saveOrder(order: OrderEntity): Promise<void>;
   updateOrder(order: OrderEntity): Promise<void>;
+  findAllOrders(): Promise<OrderEntity[]>;
 }

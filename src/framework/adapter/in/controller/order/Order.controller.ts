@@ -7,7 +7,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Patch,
+  Patch, Get,
 } from '@nestjs/common';
 import { ORDER_PORT_IN } from '../../../../../application/port/in/order/OrderPortIn.js';
 import type { OrderPortIn } from '../../../../../application/port/in/order/OrderPortIn.js';
@@ -40,5 +40,23 @@ export class OrderController {
     @Body() dto: AddItemToOrderDTO
   ): Promise<void> {
     await this.orderPortIn.addItemsToOrder(orderId, dto);
+  }
+
+  @Get()
+  async findAllOrders() {
+    const orders = await this.orderPortIn.findAllOrders();
+
+    return orders.map(order => ({
+      id: order.id,
+      tableNumber: order.tableId,
+      status: order.status,
+      createdAt: order.createdAt,
+      totalAmount: order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0),
+      items: order.items.map(item => ({
+        productName: item.productName,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    }));
   }
 }
