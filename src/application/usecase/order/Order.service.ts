@@ -4,6 +4,7 @@ import type { OrderPortOut } from '../../port/out/order/OrderPortOut.js';
 import { ORDER_PORT_OUT } from '../../port/out/order/OrderPortOut.js';
 import { CreateOrderDTO } from '../../../framework/adapter/in/dto/order/CreateOrderDTO.js';
 import { AddItemToOrderDTO } from '../../../framework/adapter/in/dto/order/AddItemToOrderDTO.js';
+import { UpdateItemStatusDTO } from '../../../framework/adapter/in/dto/order/UpdateItemStatusDTO.js';
 import { OrderEntity, OrderStatus } from '../../../domain/entity/order/OrderEntity.js';
 
 @Injectable()
@@ -56,6 +57,18 @@ export class OrderService implements OrderPortIn {
     for (const item of dto.items) {
       order.addItem(item.productId, '', item.quantity, 0);
     }
+
+    await this.orderPortOut.updateOrder(order);
+  }
+
+  async updateItemStatus(orderId: number, dto: UpdateItemStatusDTO): Promise<void> {
+    const order = await this.orderPortOut.getOrderById(orderId);
+
+    if (!order) {
+      throw new NotFoundException(`Comanda com ID ${orderId} não encontrada.`);
+    }
+
+    order.updateItemStatus(dto.productName, dto.delivered);
 
     await this.orderPortOut.updateOrder(order);
   }

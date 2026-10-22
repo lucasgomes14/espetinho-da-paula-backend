@@ -7,7 +7,8 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Patch, Get,
+  Patch,
+  Get,
 } from '@nestjs/common';
 import { ORDER_PORT_IN } from '../../../../../application/port/in/order/OrderPortIn.js';
 import type { OrderPortIn } from '../../../../../application/port/in/order/OrderPortIn.js';
@@ -42,6 +43,15 @@ export class OrderController {
     await this.orderPortIn.addItemsToOrder(orderId, dto);
   }
 
+  @Patch(":id/items")
+  @HttpCode(HttpStatus.OK)
+  async updateItemStatus(
+    @Param("id", ParseIntPipe) orderId: number,
+    @Body() body: { productName: string; delivered: boolean }
+  ): Promise<void> {
+    await this.orderPortIn.updateItemStatus(orderId, body);
+  }
+
   @Get()
   async findAllOrders() {
     const orders = await this.orderPortIn.findAllOrders();
@@ -56,6 +66,7 @@ export class OrderController {
         productName: item.productName,
         quantity: item.quantity,
         price: item.price,
+        delivered: item.delivered ?? false,
       })),
     }));
   }

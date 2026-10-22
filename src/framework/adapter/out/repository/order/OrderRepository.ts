@@ -116,7 +116,6 @@ export class OrderRepository implements OrderPortOut {
           data: { status: order.status },
         });
 
-        // Limpa os itens antigos para re-inserir o conjunto atualizado
         await tx.orderItem.deleteMany({
           where: { orderId: order.id },
         });

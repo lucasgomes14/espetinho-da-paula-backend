@@ -9,6 +9,7 @@ export interface OrderItem {
   productName: string;
   quantity: number;
   price: number;
+  delivered?: boolean; // Permite rastrear a entrega individual do item
 }
 
 export class OrderEntity {
@@ -33,7 +34,18 @@ export class OrderEntity {
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
-      this.items.push({ productId, productName, quantity, price });
+      this.items.push({ productId, productName, quantity, price, delivered: false });
+    }
+  }
+
+  // --- NOVO MÉTODO DE DOMÍNIO ---
+  updateItemStatus(productName: string, delivered: boolean): void {
+    const item = this.items.find(
+      (i) => i.productName.trim().toLowerCase() === productName.trim().toLowerCase()
+    );
+
+    if (item) {
+      item.delivered = delivered;
     }
   }
 
