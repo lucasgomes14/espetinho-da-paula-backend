@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { OrderPortOut } from '../../../../../application/port/out/order/OrderPortOut.js';
 import { OrderEntity, OrderStatus } from '../../../../../domain/entity/order/OrderEntity.js';
 import { PrismaService } from '../../persistence/prisma/PrismaService.js';
@@ -31,13 +31,13 @@ export class OrderRepository implements OrderPortOut {
           productId: item.productId,
           productName: item.product?.NAME || '',
           quantity: item.quantity,
-          price: item.price.toNumber(),
+          price: item.price ? Number(item.price) : 0,
         })),
         orderPrisma.createdAt,
       );
     } catch (error) {
       console.error(`Erro ao buscar comanda ativa para a mesa ${tableId}:`, error);
-      throw new Error('Erro interno ao acessar o banco de dados.');
+      throw new InternalServerErrorException('Erro interno ao acessar o banco de dados.');
     }
   }
 
@@ -62,13 +62,13 @@ export class OrderRepository implements OrderPortOut {
           productId: item.productId,
           productName: item.product?.NAME || '',
           quantity: item.quantity,
-          price: item.price.toNumber(),
+          price: item.price ? Number(item.price) : 0,
         })),
         orderPrisma.createdAt,
       );
     } catch (error) {
       console.error(`Erro ao buscar comanda ${id}:`, error);
-      throw new Error('Erro interno ao acessar o banco de dados.');
+      throw new InternalServerErrorException('Erro interno ao acessar o banco de dados.');
     }
   }
 
@@ -87,21 +87,24 @@ export class OrderRepository implements OrderPortOut {
             where: { ID: item.productId },
           });
 
-          const unitPrice = product ? product.PRICE : 0;
+          if (!product) {
+            throw new NotFoundException(`Produto com ID ${item.productId} não foi encontrado.`);
+          }
 
           await tx.orderItem.create({
             data: {
               orderId: createdOrder.id,
               productId: item.productId,
               quantity: item.quantity,
-              price: unitPrice,
+              price: product.PRICE,
             },
           });
         }
       });
     } catch (error) {
       console.error('Erro ao salvar comanda:', error);
-      throw new Error('Erro interno ao tentar salvar a comanda.');
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException('Erro interno ao tentar salvar a comanda.');
     }
   }
 
@@ -113,6 +116,7 @@ export class OrderRepository implements OrderPortOut {
           data: { status: order.status },
         });
 
+        // Limpa os itens antigos para re-inserir o conjunto atualizado
         await tx.orderItem.deleteMany({
           where: { orderId: order.id },
         });
@@ -122,21 +126,24 @@ export class OrderRepository implements OrderPortOut {
             where: { ID: item.productId },
           });
 
-          const unitPrice = product ? product.PRICE : item.price;
+          if (!product) {
+            throw new NotFoundException(`Produto com ID ${item.productId} não foi encontrado.`);
+          }
 
           await tx.orderItem.create({
             data: {
               orderId: order.id,
               productId: item.productId,
               quantity: item.quantity,
-              price: unitPrice,
+              price: product.PRICE,
             },
           });
         }
       });
     } catch (error) {
       console.error('Erro ao atualizar comanda:', error);
-      throw new Error('Erro interno ao atualizar a comanda.');
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException('Erro interno ao atualizar a comanda.');
     }
   }
 }

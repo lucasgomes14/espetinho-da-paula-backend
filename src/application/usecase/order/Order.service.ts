@@ -53,7 +53,10 @@ export class OrderService implements OrderPortIn {
       throw new NotFoundException(`Comanda com ID ${orderId} não encontrada.`);
     }
 
-    order.addItem(dto.productId, '', dto.quantity, 0);
+    for (const item of dto.items) {
+      order.addItem(item.productId, '', item.quantity, 0);
+    }
+
     await this.orderPortOut.updateOrder(order);
   }
 }
