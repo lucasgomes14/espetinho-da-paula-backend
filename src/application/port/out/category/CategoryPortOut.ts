@@ -1,4 +1,4 @@
-import { CategoryEntity } from '../../../../domain/entity/product/CategoryEntity.js';
+import { CategoryEntity } from '../../../../domain/entity/category/CategoryEntity.js';
 
 export const CATEGORY_PORT_OUT = 'CATEGORY_PORT_OUT';
 

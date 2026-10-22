@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -22,13 +20,51 @@ model Category {
 }
 
 model Product {
-  ID             Int      @id @default(autoincrement())
-  NAME           String   @unique
-  PRICE          Decimal  @db.Decimal(10, 2)
-  IS_ACTIVE      Boolean  @default(true)
-  CREATED_AT     DateTime @default(now()) @map("CREATED_AT")
-  CATEGORY_ID    Int      @map("CATEGORY_ID")
-  CATEGORY       Category @relation(fields: [CATEGORY_ID], references: [ID])
+  ID             Int         @id @default(autoincrement()) @map("ID")
+  NAME           String      @unique @map("NAME")
+  PRICE          Decimal     @db.Decimal(10, 2) @map("PRICE")
+  IS_ACTIVE      Boolean     @default(true) @map("IS_ACTIVE")
+  CREATED_AT     DateTime    @default(now()) @map("CREATED_AT")
+  CATEGORY_ID    Int         @map("CATEGORY_ID")
+  CATEGORY       Category    @relation(fields: [CATEGORY_ID], references: [ID])
+  orderItems     OrderItem[] // Relacionamento com os itens pedidos
 
   @@map("TBL_PRODUCT")
+}
+
+model Table {
+  id        Int       @id @default(autoincrement()) @map("id")
+  number    Int       @unique @map("number")
+  orders    Order[]
+
+  @@map("TBL_TABLE")
+}
+
+model Order {
+  id        Int         @id @default(autoincrement()) @map("id")
+  tableId   Int         @map("table_id")
+  table     Table       @relation(fields: [tableId], references: [id])
+  status    OrderStatus @default(OPEN) @map("status")
+  items     OrderItem[]
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  @@map("TBL_ORDER")
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement()) @map("id")
+  orderId   Int      @map("order_id")
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId Int      @map("product_id")
+  product   Product  @relation(fields: [productId], references: [ID])
+  quantity  Int      @default(1) @map("quantity")
+  price     Decimal  @db.Decimal(10, 2) @map("price") // Preço do produto no momento do pedido
+
+  @@map("TBL_ORDER_ITEM")
+}
+
+enum OrderStatus {
+  OPEN
+  CLOSED
+  CANCELED
 }

@@ -1,6 +1,6 @@
 import { CategoryPortOut } from '../../../../../application/port/out/category/CategoryPortOut.js';
 import { PrismaService } from '../../persistence/prisma/PrismaService.js';
-import { CategoryEntity } from '../../../../../domain/entity/product/CategoryEntity.js';
+import { CategoryEntity } from '../../../../../domain/entity/category/CategoryEntity.js';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 @Injectable()
