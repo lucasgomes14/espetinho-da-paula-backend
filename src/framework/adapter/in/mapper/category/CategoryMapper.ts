@@ -1,4 +1,4 @@
-import { CategoryEntity } from '../../../../../domain/entity/product/CategoryEntity.js';
+import { CategoryEntity } from '../../../../../domain/entity/category/CategoryEntity.js';
 import { CategoryDTO } from '../../dto/category/CategoryDTO.js';
 
 export class CategoryMapper {
