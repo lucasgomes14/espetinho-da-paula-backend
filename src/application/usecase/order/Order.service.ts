@@ -59,4 +59,8 @@ export class OrderService implements OrderPortIn {
 
     await this.orderPortOut.updateOrder(order);
   }
+
+  async findAllOrders(): Promise<OrderEntity[]> {
+    return await this.orderPortOut.findAllOrders();
+  }
 }

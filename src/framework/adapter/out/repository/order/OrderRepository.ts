@@ -146,4 +146,35 @@ export class OrderRepository implements OrderPortOut {
       throw new InternalServerErrorException('Erro interno ao atualizar a comanda.');
     }
   }
+
+  async findAllOrders(): Promise<OrderEntity[]> {
+    try {
+      const ordersPrisma = await this.prisma.order.findMany({
+        include: {
+          items: {
+            include: { product: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      return ordersPrisma.map((orderPrisma: any) =>
+        new OrderEntity(
+          orderPrisma.id,
+          orderPrisma.tableId,
+          orderPrisma.status as OrderStatus,
+          orderPrisma.items.map((item: any) => ({
+            productId: item.productId,
+            productName: item.product?.NAME || '',
+            quantity: item.quantity,
+            price: item.price ? Number(item.price) : 0,
+          })),
+          orderPrisma.createdAt,
+        )
+      );
+    } catch (error) {
+      console.error('Erro ao buscar todas as comandas:', error);
+      throw new InternalServerErrorException('Erro interno ao acessar o banco de dados.');
+    }
+  }
 }
